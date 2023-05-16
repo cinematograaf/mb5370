@@ -1,0 +1,63 @@
+---
+title: "Assignment_2"
+author: "Phill Graaf"
+date: "2023-05-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Shark data tidying and plotting ####
+
+
+For this section we used a Data Set from QFish.
+We wanted to look at how many individuals of which species (mammal, other, shark and turtle) were found in the different locations.
+We began by deleting the years that we did not need in our excel file, sorting the areas from north to south and imported the data into R:
+
+```{r}
+install.packages("tidyr", repos = "http://cran.us.r-project.org")
+library("tidyr")
+install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+library("ggplot2")
+install.packages("dplyr", repos = "http://cran.us.r-project.org")
+library("dplyr")
+shark <- read.csv("/Users/cinematograaf/Documents/JCU/Sem 3/TIMS1/Introduction to Data Science/Homework 2/shark_data.csv")
+
+shark
+```
+
+Because we had the variables "year" and "area" as columns, but every single species was a column itself, we wanted to make this
+table "longer" since a table of a similar format with more entries would get unnecessarily wide and would be harder to analyse
+
+We pivoted the offending columns into a new set of variables called "species" and "count":
+
+```{r}
+shark_new <- shark %>%
+  pivot_longer(c(`mammal`, `other`, `shark`, `turtle`), names_to="species", values_to="count")
+```
+
+It works!
+Here is our new table:
+
+```{r}
+shark_new
+```
+So here we have our new table!
+Now we can begin plotting it:
+
+
+```{r}
+ggplot(data=shark_new)+
+  geom_col(mapping=aes(x=factor(area), y=count, fill=species), position="dodge2")+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 110), breaks = scales::pretty_breaks(n = 20))+
+  scale_x_discrete(limits=shark_new$area)+
+  labs(title="Relative abundance of 4 different species disaggregated by area \nfrom North to South.", x="Area", y="Number of Individuals")+
+  theme_classic()+
+   theme(plot.title=element_text(size=14, face="bold", hjust = 0.5), axis.title.x = element_text(size=12), axis.title.y = element_text(size=12), axis.text = element_text(size=10))+
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+ggsave("Shark_Plot.jpg")
+```
+And there we have our finished Result!

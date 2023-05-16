@@ -1,0 +1,55 @@
+---
+title: "Assignment 1"
+author: "Phill Graaf"
+date: "2023-05-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First we installed the packages we needed and imported the data:
+```{r}
+install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+library("ggplot2")
+install.packages("dplyr", repos = "http://cran.us.r-project.org")
+library("dplyr")
+good_plot <- read.csv("/Users/cinematograaf/Documents/JCU/Sem 3/TIMS1/Introduction to Data Science/Homework 1/Bad Plot revisited.csv")
+```
+Then we plotted the data as a line graph which did not look too bad:
+```{r}
+ggplot(data=good_plot, mapping=aes(x=HG, y=HR, group=Quartile, colour=Quartile))+
+  geom_line()+
+  geom_point() # this works!!
+```
+<br>
+But because we thought we could do better, we tried making a bar graph with the different quartiles stacked next to each other:
+```{r}
+good_plot %>%
+  ggplot(aes(HG, HR))+
+   geom_col(aes(fill=Quartile), position="dodge2")+
+labs(x="Hematocrit Group", y="Hazard Ratio") # works!!!
+
+plot_labels <- c("<30", "30 - <33", "33 - <36", "36 - <39", ">=<39")
+```
+<br>
+Now we also wanted to add a Title:
+
+```{r}
+plot_final <- good_plot %>%
+  ggplot(aes(x=factor(HG), y=HR))+
+  geom_col(aes(fill=Quartile), position="dodge2")+
+  labs(title="Relative risk of death by hematocrit group \ndisaggregated by epoetin dose quartile.", x="Hematocrit Group (%)", y="Hazard Ratio")+
+  theme(plot.title=element_text(size=18, face="bold", hjust = 0.5), axis.title.x = element_text(size=15), axis.title.y = element_text(size=15), axis.text = element_text(size=14))+
+scale_x_discrete(labels=c("<30", "30 - <33", "33 - <36", "36 - <39", ">39"))
+
+plot_final
+```
+<br>
+Now all we needed to do was save our plot!
+```{r}
+ggsave("Enhanced_Plot.jpg")
+```
+
+And Voilà!
